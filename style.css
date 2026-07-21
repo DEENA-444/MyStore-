@@ -11,15 +11,14 @@ body {
 
 /* Navigation Bar */
 
-.navbar {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background: #131921;
-    color: white;
-    padding: 12px 25px;
+.navbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    background:#131921;
+    padding:10px 20px;
 }
-
 .logo {
     font-size: 28px;
     font-weight: bold;
@@ -862,10 +861,12 @@ footer {
     font-weight: bold;
 }
 
-.account-area {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.account-area{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    color:white;
+    white-space:nowrap;
 }
 
 .logout-button {
@@ -1912,12 +1913,14 @@ img {
     gap:10px;
 }
 
-.orders-link,
 .cart-link,
+.orders-link,
+.wishlist-link,
 .account-link{
-    font-size:14px;
+    color:white;
+    text-decoration:none;
+    font-weight:600;
 }
-
 }
 
 /* ==========================
