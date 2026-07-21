@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Wishlist - MyStore</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo" onclick="window.location.href='index.html'">
+            MyStore
+        </div>
+
+        <div class="nav-links">
+
+            <a href="index.html">Home</a>
+
+            <a href="orders.html">My Orders</a>
+
+            <a href="wishlist.html">
+                Wishlist ❤️
+                <span id="wishlistCount">0</span>
+            </a>
+
+            <a href="cart.html">
+                Cart 🛒
+                <span id="cartCount">0</span>
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="wishlist-page">
+
+        <h1>My Wishlist ❤️</h1>
+
+        <div id="wishlistContainer" class="product-grid"></div>
+
+        <div id="emptyWishlist" class="empty-message">
+
+            <h2>Your wishlist is empty</h2>
+
+            <p>Save products you like and purchase them later.</p>
+
+            <a href="index.html" class="shop-now-btn">
+                Continue Shopping
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+
+        <p>© 2026 MyStore. All rights reserved.</p>
+
+    </footer>
+
+
+    <script>
+
+        const wishlistContainer =
+            document.getElementById("wishlistContainer");
+
+        const emptyWishlist =
+            document.getElementById("emptyWishlist");
+
+        const wishlistCount =
+            document.getElementById("wishlistCount");
+
+        const cartCount =
+            document.getElementById("cartCount");
+
+
+        function getProducts() {
+
+            return JSON.parse(
+                localStorage.getItem("storeProducts")
+            ) || [];
+
+        }
+
+
+        function getWishlist() {
+
+            return JSON.parse(
+                localStorage.getItem("wishlist")
+            ) || [];
+
+        }
+
+
+        function getCart() {
+
+            return JSON.parse(
+                localStorage.getItem("cart")
+            ) || [];
+
+        }
+
+
+        function updateCounts() {
+
+            const wishlist = getWishlist();
+            const cart = getCart();
+
+            wishlistCount.textContent =
+                wishlist.length;
+
+            let totalCartQuantity = 0;
+
+            cart.forEach(item => {
+
+                totalCartQuantity +=
+                    Number(item.quantity) || 1;
+
+            });
+
+            cartCount.textContent =
+                totalCartQuantity;
+
+        }
+
+
+        function removeFromWishlist(productId) {
+
+            let wishlist = getWishlist();
+
+            wishlist = wishlist.filter(
+                id => String(id) !== String(productId)
+            );
+
+            localStorage.setItem(
+                "wishlist",
+                JSON.stringify(wishlist)
+            );
+
+            displayWishlist();
+
+        }
+
+
+        function addToCart(productId) {
+
+            const products = getProducts();
+
+            const selectedProduct =
+                products.find(
+                    product =>
+                        String(product.id) ===
+                        String(productId)
+                );
+
+            if (!selectedProduct) {
+
+                alert("Product not found.");
+
+                return;
+
+            }
+
+
+            let cart = getCart();
+
+            const existingProduct =
+                cart.find(
+                    item =>
+                        String(item.id) ===
+                        String(productId)
+                );
+
+
+            if (existingProduct) {
+
+                existingProduct.quantity =
+                    Number(existingProduct.quantity || 1) + 1;
+
+            } else {
+
+                cart.push({
+
+                    ...selectedProduct,
+
+                    quantity: 1
+
+                });
+
+            }
+
+
+            localStorage.setItem(
+                "cart",
+                JSON.stringify(cart)
+            );
+
+            updateCounts();
+
+            alert("Product added to cart.");
+
+        }
+
+
+        function openProduct(productId) {
+
+            localStorage.setItem(
+                "selectedProductId",
+                productId
+            );
+
+            window.location.href =
+                "product.html";
+
+        }
+
+
+        function displayWishlist() {
+
+            const products = getProducts();
+
+            const wishlist = getWishlist();
+
+
+            const wishlistProducts =
+                products.filter(product =>
+                    wishlist.some(
+                        id =>
+                            String(id) ===
+                            String(product.id)
+                    )
+                );
+
+
+            wishlistContainer.innerHTML = "";
+
+
+            if (wishlistProducts.length === 0) {
+
+                emptyWishlist.style.display =
+                    "block";
+
+                wishlistContainer.style.display =
+                    "none";
+
+                updateCounts();
+
+                return;
+
+            }
+
+
+            emptyWishlist.style.display =
+                "none";
+
+            wishlistContainer.style.display =
+                "grid";
+
+
+            wishlistProducts.forEach(product => {
+
+                const productCard =
+                    document.createElement("div");
+
+                productCard.className =
+                    "product-card wishlist-card";
+
+
+                productCard.innerHTML = `
+
+                    <button
+                        class="remove-wishlist-btn"
+                        onclick="removeFromWishlist('${product.id}')"
+                        title="Remove from wishlist"
+                    >
+                        ×
+                    </button>
+
+                    <img
+                        src="${product.image}"
+                        alt="${product.name}"
+                        onclick="openProduct('${product.id}')"
+                        onerror="this.src='https://via.placeholder.com/250x200?text=Product'"
+                    >
+
+                    <h3
+                        onclick="openProduct('${product.id}')"
+                    >
+                        ${product.name}
+                    </h3>
+
+                    <p class="product-category">
+                        ${product.category || "General"}
+                    </p>
+
+                    <div class="rating">
+                        ⭐ ${product.rating || "4.0"}
+                    </div>
+
+                    <p class="product-price">
+                        ₹${Number(product.price).toLocaleString("en-IN")}
+                    </p>
+
+                    <div class="wishlist-actions">
+
+                        <button
+                            class="view-product-btn"
+                            onclick="openProduct('${product.id}')"
+                        >
+                            View Product
+                        </button>
+
+                        <button
+                            class="add-cart-btn"
+                            onclick="addToCart('${product.id}')"
+                        >
+                            Add to Cart
+                        </button>
+
+                    </div>
+
+                `;
+
+                wishlistContainer.appendChild(
+                    productCard
+                );
+
+            });
+
+
+            updateCounts();
+
+        }
+
+
+        displayWishlist();
+
+    </script>
+
+</body>
+</html>

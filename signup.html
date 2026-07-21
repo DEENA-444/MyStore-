@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Account - MyStore</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a href="index.html" class="logo-link">
+            MyStore
+        </a>
+
+    </header>
+
+
+    <main class="auth-page">
+
+        <div class="auth-box">
+
+            <h1>Create Account</h1>
+
+            <form id="signupForm">
+
+                <label for="signupName">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="signupName"
+                    placeholder="Enter your name"
+                    required
+                >
+
+
+                <label for="signupEmail">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="signupEmail"
+                    placeholder="Enter your email"
+                    required
+                >
+
+
+                <label for="signupPhone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="signupPhone"
+                    placeholder="Enter 10-digit phone number"
+                    maxlength="10"
+                    required
+                >
+
+
+                <label for="signupPassword">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="signupPassword"
+                    placeholder="Minimum 6 characters"
+                    required
+                >
+
+
+                <label for="confirmPassword">
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Enter password again"
+                    required
+                >
+
+
+                <p id="signupError" class="form-error"></p>
+
+                <p id="signupSuccess" class="form-success"></p>
+
+
+                <button
+                    type="submit"
+                    class="auth-button"
+                >
+                    Create Account
+                </button>
+
+            </form>
+
+
+            <p class="auth-switch">
+
+                Already have an account?
+
+                <a href="login.html">
+                    Login
+                </a>
+
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        const signupForm =
+            document.getElementById("signupForm");
+
+        const signupError =
+            document.getElementById("signupError");
+
+        const signupSuccess =
+            document.getElementById("signupSuccess");
+
+
+        signupForm.addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+                signupError.textContent = "";
+
+                signupSuccess.textContent = "";
+
+
+                const name =
+                    document
+                        .getElementById("signupName")
+                        .value
+                        .trim();
+
+                const email =
+                    document
+                        .getElementById("signupEmail")
+                        .value
+                        .trim()
+                        .toLowerCase();
+
+                const phone =
+                    document
+                        .getElementById("signupPhone")
+                        .value
+                        .trim();
+
+                const password =
+                    document
+                        .getElementById("signupPassword")
+                        .value;
+
+                const confirmPassword =
+                    document
+                        .getElementById("confirmPassword")
+                        .value;
+
+
+                if (name.length < 3) {
+
+                    signupError.textContent =
+                        "Enter a valid full name.";
+
+                    return;
+
+                }
+
+
+                if (!/^[0-9]{10}$/.test(phone)) {
+
+                    signupError.textContent =
+                        "Enter a valid 10-digit phone number.";
+
+                    return;
+
+                }
+
+
+                if (password.length < 6) {
+
+                    signupError.textContent =
+                        "Password must contain at least 6 characters.";
+
+                    return;
+
+                }
+
+
+                if (password !== confirmPassword) {
+
+                    signupError.textContent =
+                        "Passwords do not match.";
+
+                    return;
+
+                }
+
+
+                let users = JSON.parse(
+                    localStorage.getItem("users")
+                ) || [];
+
+
+                const existingUser =
+                    users.find(function(user) {
+
+                        return user.email === email;
+
+                    });
+
+
+                if (existingUser) {
+
+                    signupError.textContent =
+                        "An account already exists with this email.";
+
+                    return;
+
+                }
+
+
+                const newUser = {
+
+                    id: "USER" + Date.now(),
+
+                    name: name,
+
+                    email: email,
+
+                    phone: phone,
+
+                    password: password
+
+                };
+
+
+                users.push(newUser);
+
+
+                localStorage.setItem(
+                    "users",
+                    JSON.stringify(users)
+                );
+
+
+                signupSuccess.textContent =
+                    "Account created successfully!";
+
+
+                signupForm.reset();
+
+
+                setTimeout(function() {
+
+                    window.location.href =
+                        "login.html";
+
+                }, 1200);
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>

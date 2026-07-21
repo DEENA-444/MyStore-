@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Orders - MyStore</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a
+            href="index.html"
+            class="logo-link"
+        >
+            MyStore
+        </a>
+
+        <h2 class="cart-title">
+            My Orders
+        </h2>
+
+        <a
+            href="index.html"
+            class="continue-shopping"
+        >
+            Continue Shopping
+        </a>
+
+    </header>
+
+
+    <main class="orders-page">
+
+        <h1>My Orders</h1>
+
+        <div id="ordersContainer"></div>
+
+    </main>
+
+
+    <script>
+
+        const ordersContainer =
+            document.getElementById(
+                "ordersContainer"
+            );
+
+
+        let orders = JSON.parse(
+            localStorage.getItem("orders")
+        ) || [];
+
+
+        function formatPrice(price) {
+
+            return "₹" +
+                Number(price).toLocaleString(
+                    "en-IN"
+                );
+
+        }
+
+
+        function displayOrders() {
+
+            ordersContainer.innerHTML = "";
+
+
+            if (orders.length === 0) {
+
+                ordersContainer.innerHTML = `
+
+                    <div class="no-orders">
+
+                        <h2>No orders found</h2>
+
+                        <p>
+                            You have not placed any orders yet.
+                        </p>
+
+                        <a href="index.html">
+                            Start Shopping
+                        </a>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            const reversedOrders =
+                [...orders].reverse();
+
+
+            reversedOrders.forEach(
+                function(order) {
+
+                    const orderBox =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    orderBox.className =
+                        "order-card";
+
+
+                    let productsHTML = "";
+
+
+                    order.products.forEach(
+                        function(product) {
+
+                            productsHTML += `
+
+                                <div class="ordered-product">
+
+                                    <img
+                                        src="${product.image}"
+                                        alt="${product.name}"
+                                    >
+
+                                    <div>
+
+                                        <h3>
+                                            ${product.name}
+                                        </h3>
+
+                                        <p>
+                                            Quantity:
+                                            ${product.quantity}
+                                        </p>
+
+                                        <p>
+
+                                            Price:
+                                            ${formatPrice(
+                                                product.price
+                                            )}
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            `;
+
+                        }
+                    );
+
+
+                    orderBox.innerHTML = `
+
+                        <div class="order-header">
+
+                            <div>
+
+                                <p class="small-text">
+                                    ORDER PLACED
+                                </p>
+
+                                <strong>
+                                    ${order.orderDate}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <p class="small-text">
+                                    TOTAL
+                                </p>
+
+                                <strong>
+
+                                    ${formatPrice(
+                                        order.totalPrice
+                                    )}
+
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <p class="small-text">
+                                    ORDER ID
+                                </p>
+
+                                <strong>
+                                    ${order.orderId}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="order-body">
+
+                            <div class="order-status">
+
+                                <h2>
+                                    Order Confirmed
+                                </h2>
+
+                                <p>
+                                    Payment:
+                                    ${order.payment}
+                                </p>
+
+                                <p>
+                                    Customer:
+                                    ${order.customerName}
+                                </p>
+
+                                <p>
+                                    Delivery Address:
+                                    ${order.address},
+                                    ${order.city},
+                                    ${order.state}
+                                    -
+                                    ${order.pincode}
+                                </p>
+
+                            </div>
+
+
+                            <div class="ordered-products-list">
+
+                                ${productsHTML}
+
+                            </div>
+
+
+                            <button
+                                class="cancel-order-button"
+                                onclick="cancelOrder(
+                                    '${order.orderId}'
+                                )"
+                            >
+                                Cancel Order
+                            </button>
+
+                        </div>
+
+                    `;
+
+
+                    ordersContainer.appendChild(
+                        orderBox
+                    );
+
+                }
+            );
+
+        }
+
+
+        function cancelOrder(orderId) {
+
+            const confirmCancel =
+                confirm(
+                    "Are you sure you want to cancel this order?"
+                );
+
+
+            if (!confirmCancel) {
+
+                return;
+
+            }
+
+
+            orders = orders.filter(
+                function(order) {
+
+                    return order.orderId !==
+                        orderId;
+
+                }
+            );
+
+
+            localStorage.setItem(
+                "orders",
+                JSON.stringify(orders)
+            );
+
+
+            displayOrders();
+
+        }
+
+
+        displayOrders();
+
+    </script>
+
+</body>
+</html>

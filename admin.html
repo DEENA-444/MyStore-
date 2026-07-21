@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Panel - MyStore</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a
+            href="index.html"
+            class="logo-link"
+        >
+            MyStore
+        </a>
+
+        <h2 class="cart-title">
+            Admin Panel
+        </h2>
+
+        <a
+            href="index.html"
+            class="continue-shopping"
+        >
+            View Store
+        </a>
+
+    </header>
+
+
+    <!-- Admin Login -->
+
+    <main
+        class="admin-login-page"
+        id="adminLoginPage"
+    >
+
+        <div class="auth-box">
+
+            <h1>Admin Login</h1>
+
+            <form id="adminLoginForm">
+
+                <label for="adminPassword">
+                    Admin Password
+                </label>
+
+                <input
+                    type="password"
+                    id="adminPassword"
+                    placeholder="Enter admin password"
+                    required
+                >
+
+                <p
+                    id="adminLoginError"
+                    class="form-error"
+                ></p>
+
+                <button
+                    type="submit"
+                    class="auth-button"
+                >
+                    Login as Admin
+                </button>
+
+            </form>
+
+            <p class="demo-note">
+                Demo password:
+                <strong>admin123</strong>
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- Admin Dashboard -->
+
+    <main
+        class="admin-page"
+        id="adminDashboard"
+    >
+
+        <div class="admin-heading">
+
+            <h1>Product Management</h1>
+
+            <button
+                id="adminLogoutButton"
+                class="admin-logout"
+            >
+                Admin Logout
+            </button>
+
+        </div>
+
+
+        <section class="admin-grid">
+
+            <div class="admin-form-box">
+
+                <h2>Add New Product</h2>
+
+                <form id="productForm">
+
+                    <label for="productName">
+                        Product Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="productName"
+                        placeholder="Example: Smart Watch"
+                        required
+                    >
+
+
+                    <label for="productPrice">
+                        Product Price
+                    </label>
+
+                    <input
+                        type="number"
+                        id="productPrice"
+                        placeholder="Example: 2999"
+                        min="1"
+                        required
+                    >
+
+
+                    <label for="productCategory">
+                        Category
+                    </label>
+
+                    <select
+                        id="productCategory"
+                        required
+                    >
+
+                        <option value="">
+                            Select category
+                        </option>
+
+                        <option value="Mobiles">
+                            Mobiles
+                        </option>
+
+                        <option value="Laptops">
+                            Laptops
+                        </option>
+
+                        <option value="Electronics">
+                            Electronics
+                        </option>
+
+                        <option value="Accessories">
+                            Accessories
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+
+                    <label for="productImage">
+                        Image Path
+                    </label>
+
+                    <input
+                        type="text"
+                        id="productImage"
+                        placeholder="images/watch.jpg"
+                        required
+                    >
+
+
+                    <label for="productRating">
+                        Rating
+                    </label>
+
+                    <select
+                        id="productRating"
+                        required
+                    >
+
+                        <option value="5">
+                            5 Stars
+                        </option>
+
+                        <option value="4">
+                            4 Stars
+                        </option>
+
+                        <option value="3">
+                            3 Stars
+                        </option>
+
+                        <option value="2">
+                            2 Stars
+                        </option>
+
+                        <option value="1">
+                            1 Star
+                        </option>
+
+                    </select>
+
+
+                    <p
+                        id="productMessage"
+                        class="form-success"
+                    ></p>
+
+
+                    <button
+                        type="submit"
+                        class="auth-button"
+                    >
+                        Add Product
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="admin-products-box">
+
+                <h2>Current Products</h2>
+
+                <div id="adminProductsList"></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        const ADMIN_PASSWORD =
+            "admin123";
+
+
+        const adminLoginPage =
+            document.getElementById(
+                "adminLoginPage"
+            );
+
+        const adminDashboard =
+            document.getElementById(
+                "adminDashboard"
+            );
+
+        const adminLoginForm =
+            document.getElementById(
+                "adminLoginForm"
+            );
+
+        const adminLoginError =
+            document.getElementById(
+                "adminLoginError"
+            );
+
+        const adminLogoutButton =
+            document.getElementById(
+                "adminLogoutButton"
+            );
+
+        const productForm =
+            document.getElementById(
+                "productForm"
+            );
+
+        const productMessage =
+            document.getElementById(
+                "productMessage"
+            );
+
+        const adminProductsList =
+            document.getElementById(
+                "adminProductsList"
+            );
+
+
+        let products = JSON.parse(
+            localStorage.getItem(
+                "storeProducts"
+            )
+        ) || [];
+
+
+        function showAdminPage() {
+
+            const adminLoggedIn =
+                sessionStorage.getItem(
+                    "adminLoggedIn"
+                );
+
+
+            if (adminLoggedIn === "true") {
+
+                adminLoginPage.style.display =
+                    "none";
+
+                adminDashboard.style.display =
+                    "block";
+
+                displayAdminProducts();
+
+            } else {
+
+                adminLoginPage.style.display =
+                    "flex";
+
+                adminDashboard.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+        adminLoginForm.addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+
+                const password =
+                    document
+                        .getElementById(
+                            "adminPassword"
+                        )
+                        .value;
+
+
+                if (
+                    password !==
+                    ADMIN_PASSWORD
+                ) {
+
+                    adminLoginError.textContent =
+                        "Incorrect admin password.";
+
+                    return;
+
+                }
+
+
+                sessionStorage.setItem(
+                    "adminLoggedIn",
+                    "true"
+                );
+
+
+                adminLoginError.textContent =
+                    "";
+
+
+                showAdminPage();
+
+            }
+        );
+
+
+        adminLogoutButton.addEventListener(
+            "click",
+            function() {
+
+                sessionStorage.removeItem(
+                    "adminLoggedIn"
+                );
+
+
+                showAdminPage();
+
+            }
+        );
+
+
+        productForm.addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+
+                const productName =
+                    document
+                        .getElementById(
+                            "productName"
+                        )
+                        .value
+                        .trim();
+
+                const productPrice =
+                    Number(
+                        document
+                            .getElementById(
+                                "productPrice"
+                            )
+                            .value
+                    );
+
+                const productCategory =
+                    document
+                        .getElementById(
+                            "productCategory"
+                        )
+                        .value;
+
+                const productImage =
+                    document
+                        .getElementById(
+                            "productImage"
+                        )
+                        .value
+                        .trim();
+
+                const productRating =
+                    Number(
+                        document
+                            .getElementById(
+                                "productRating"
+                            )
+                            .value
+                    );
+
+
+                const newProduct = {
+
+                    id:
+                        "PRODUCT" +
+                        Date.now(),
+
+                    name:
+                        productName,
+
+                    searchName:
+                        (
+                            productName +
+                            " " +
+                            productCategory
+                        ).toLowerCase(),
+
+                    price:
+                        productPrice,
+
+                    category:
+                        productCategory,
+
+                    image:
+                        productImage,
+
+                    rating:
+                        productRating
+
+                };
+
+
+                products.push(newProduct);
+
+
+                saveProducts();
+
+
+                productMessage.textContent =
+                    "Product added successfully!";
+
+
+                productForm.reset();
+
+
+                displayAdminProducts();
+
+
+                setTimeout(function() {
+
+                    productMessage.textContent =
+                        "";
+
+                }, 2000);
+
+            }
+        );
+
+
+        function saveProducts() {
+
+            localStorage.setItem(
+                "storeProducts",
+                JSON.stringify(products)
+            );
+
+        }
+
+
+        function formatPrice(price) {
+
+            return "₹" +
+                Number(price)
+                    .toLocaleString(
+                        "en-IN"
+                    );
+
+        }
+
+
+        function displayAdminProducts() {
+
+            adminProductsList.innerHTML = "";
+
+
+            if (products.length === 0) {
+
+                adminProductsList.innerHTML = `
+
+                    <p>
+                        No products available.
+                    </p>
+
+                `;
+
+                return;
+
+            }
+
+
+            products.forEach(
+                function(product) {
+
+                    const productBox =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    productBox.className =
+                        "admin-product-item";
+
+
+                    productBox.innerHTML = `
+
+                        <img
+                            src="${product.image}"
+                            alt="${product.name}"
+                            onerror="
+                                this.src='https://placehold.co/100x100?text=No+Image'
+                            "
+                        >
+
+                        <div class="admin-product-info">
+
+                            <h3>
+                                ${product.name}
+                            </h3>
+
+                            <p>
+                                ${product.category}
+                            </p>
+
+                            <strong>
+                                ${formatPrice(
+                                    product.price
+                                )}
+                            </strong>
+
+                        </div>
+
+                        <button
+                            class="admin-delete-button"
+                            onclick="
+                                deleteProduct(
+                                    '${product.id}'
+                                )
+                            "
+                        >
+                            Delete
+                        </button>
+
+                    `;
+
+
+                    adminProductsList
+                        .appendChild(
+                            productBox
+                        );
+
+                }
+            );
+
+        }
+
+
+        function deleteProduct(productId) {
+
+            const confirmDelete =
+                confirm(
+                    "Delete this product?"
+                );
+
+
+            if (!confirmDelete) {
+                return;
+            }
+
+
+            products =
+                products.filter(
+                    function(product) {
+
+                        return (
+                            product.id !==
+                            productId
+                        );
+
+                    }
+                );
+
+
+            saveProducts();
+
+            displayAdminProducts();
+
+        }
+
+
+        showAdminPage();
+
+    </script>
+
+</body>
+</html>

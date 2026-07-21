@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Order Successful</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a
+            href="index.html"
+            class="logo-link"
+        >
+            MyStore
+        </a>
+
+    </header>
+
+
+    <main class="success-page">
+
+        <div class="success-box">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <h1>Order Placed Successfully!</h1>
+
+            <p>
+                Thank you for shopping with MyStore.
+            </p>
+
+
+            <div class="order-details">
+
+                <p>
+
+                    <strong>
+                        Order ID:
+                    </strong>
+
+                    <span id="orderId"></span>
+
+                </p>
+
+                <p>
+
+                    <strong>
+                        Customer:
+                    </strong>
+
+                    <span id="orderCustomer"></span>
+
+                </p>
+
+                <p>
+
+                    <strong>
+                        Payment:
+                    </strong>
+
+                    <span id="orderPayment"></span>
+
+                </p>
+
+                <p>
+
+                    <strong>
+                        Order Total:
+                    </strong>
+
+                    <span id="orderTotal"></span>
+
+                </p>
+
+                <p>
+
+                    <strong>
+                        Delivery Address:
+                    </strong>
+
+                    <span id="orderAddress"></span>
+
+                </p>
+
+            </div>
+
+
+ <div class="success-buttons">
+
+    <a
+        href="orders.html"
+        class="continue-button"
+    >
+        View My Orders
+    </a>
+
+    <a
+        href="index.html"
+        class="continue-button secondary-button"
+    >
+        Continue Shopping
+    </a>
+
+</div>
+        </div>
+
+    </main>
+
+
+    <script>
+
+        const order = JSON.parse(
+            localStorage.getItem(
+                "latestOrder"
+            )
+        );
+
+
+        if (!order) {
+
+            window.location.href =
+                "index.html";
+
+        } else {
+
+            document.getElementById(
+                "orderId"
+            ).textContent =
+                order.orderId;
+
+
+            document.getElementById(
+                "orderCustomer"
+            ).textContent =
+                order.customerName;
+
+
+            document.getElementById(
+                "orderPayment"
+            ).textContent =
+                order.payment;
+
+
+            document.getElementById(
+                "orderTotal"
+            ).textContent =
+                "₹" +
+                order.totalPrice
+                    .toLocaleString(
+                        "en-IN"
+                    );
+
+
+            document.getElementById(
+                "orderAddress"
+            ).textContent =
+                order.address +
+                ", " +
+                order.city +
+                ", " +
+                order.state +
+                " - " +
+                order.pincode;
+
+        }
+
+    </script>
+
+</body>
+</html>

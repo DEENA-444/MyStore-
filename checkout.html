@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Checkout - MyStore</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <a
+            href="index.html"
+            class="logo-link"
+        >
+            MyStore
+        </a>
+
+        <h2 class="cart-title">
+            Secure Checkout
+        </h2>
+
+        <a
+            href="cart.html"
+            class="continue-shopping"
+        >
+            Back to Cart
+        </a>
+
+    </header>
+
+
+    <main class="checkout-page">
+
+        <section class="checkout-form-box">
+
+            <h2>Delivery Address</h2>
+
+            <form id="checkoutForm">
+
+                <label for="customerName">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="customerName"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+
+                <label for="phone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="Enter 10-digit phone number"
+                    maxlength="10"
+                    required
+                >
+
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+
+                <label for="address">
+                    Full Address
+                </label>
+
+                <textarea
+                    id="address"
+                    rows="4"
+                    placeholder="House number, street and area"
+                    required
+                ></textarea>
+
+
+                <div class="checkout-row">
+
+                    <div>
+
+                        <label for="city">
+                            City
+                        </label>
+
+                        <input
+                            type="text"
+                            id="city"
+                            placeholder="City"
+                            required
+                        >
+
+                    </div>
+
+                    <div>
+
+                        <label for="state">
+                            State
+                        </label>
+
+                        <input
+                            type="text"
+                            id="state"
+                            placeholder="State"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <label for="pincode">
+                    PIN Code
+                </label>
+
+                <input
+                    type="text"
+                    id="pincode"
+                    placeholder="Enter 6-digit PIN code"
+                    maxlength="6"
+                    required
+                >
+
+
+                <h2>Payment Method</h2>
+
+                <label class="payment-option">
+
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="Cash on Delivery"
+                        checked
+                    >
+
+                    Cash on Delivery
+
+                </label>
+
+                <label class="payment-option">
+
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="UPI Demo"
+                    >
+
+                    UPI Payment
+
+                </label>
+
+                <label class="payment-option">
+
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="Card Demo"
+
+                        <p class="payment-note">
+    Payment integration is not active yet. Choose Cash on Delivery to place the order.
+</p>
+                    >
+
+                    Credit / Debit Card
+
+                </label>
+
+
+                <p
+                    id="formError"
+                    class="form-error"
+                ></p>
+
+
+                <button
+                    type="submit"
+                    class="place-order-button"
+                >
+                    Place Order
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <aside class="checkout-summary">
+
+            <h2>Order Summary</h2>
+
+            <div id="checkoutItems"></div>
+
+            <hr>
+
+            <div class="summary-row">
+
+                <span>Items</span>
+
+                <span id="checkoutItemCount">
+                    0
+                </span>
+
+            </div>
+
+            <div class="summary-row">
+
+                <span>Delivery</span>
+
+                <span class="free-text">
+                    FREE
+                </span>
+
+            </div>
+
+            <div class="summary-row total-row">
+
+                <span>Order Total</span>
+
+                <span id="checkoutTotal">
+                    ₹0
+                </span>
+
+            </div>
+
+        </aside>
+
+    </main>
+
+
+    <script>
+
+        let cart = JSON.parse(
+            localStorage.getItem("cart")
+        ) || [];
+
+
+        const checkoutItems =
+            document.getElementById(
+                "checkoutItems"
+            );
+
+        const checkoutItemCount =
+            document.getElementById(
+                "checkoutItemCount"
+            );
+
+        const checkoutTotal =
+            document.getElementById(
+                "checkoutTotal"
+            );
+
+        const checkoutForm =
+            document.getElementById(
+                "checkoutForm"
+            );
+
+        const formError =
+            document.getElementById(
+                "formError"
+            );
+
+
+        function formatPrice(price) {
+
+            return "₹" +
+                price.toLocaleString("en-IN");
+
+        }
+
+
+        function displayCheckoutSummary() {
+
+            if (cart.length === 0) {
+
+                window.location.href =
+                    "cart.html";
+
+                return;
+
+            }
+
+
+            let totalQuantity = 0;
+
+            let totalPrice = 0;
+
+            checkoutItems.innerHTML = "";
+
+
+            cart.forEach(function(item) {
+
+                totalQuantity +=
+                    item.quantity;
+
+                totalPrice +=
+                    item.price *
+                    item.quantity;
+
+
+                const itemBox =
+                    document.createElement("div");
+
+
+                itemBox.className =
+                    "checkout-item";
+
+
+                itemBox.innerHTML = `
+
+                    <img
+                        src="${item.image}"
+                        alt="${item.name}"
+                    >
+
+                    <div>
+
+                        <h4>
+                            ${item.name}
+                        </h4>
+
+                        <p>
+                            Quantity:
+                            ${item.quantity}
+                        </p>
+
+                        <strong>
+
+                            ${formatPrice(
+                                item.price *
+                                item.quantity
+                            )}
+
+                        </strong>
+
+                    </div>
+
+                `;
+
+
+                checkoutItems.appendChild(
+                    itemBox
+                );
+
+            });
+
+
+            checkoutItemCount.textContent =
+                totalQuantity;
+
+
+            checkoutTotal.textContent =
+                formatPrice(totalPrice);
+
+        }
+
+
+        checkoutForm.addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+
+                const customerName =
+                    document
+                        .getElementById(
+                            "customerName"
+                        )
+                        .value
+                        .trim();
+
+                const phone =
+                    document
+                        .getElementById(
+                            "phone"
+                        )
+                        .value
+                        .trim();
+
+                const email =
+                    document
+                        .getElementById(
+                            "email"
+                        )
+                        .value
+                        .trim();
+
+                const address =
+                    document
+                        .getElementById(
+                            "address"
+                        )
+                        .value
+                        .trim();
+
+                const city =
+                    document
+                        .getElementById(
+                            "city"
+                        )
+                        .value
+                        .trim();
+
+                const state =
+                    document
+                        .getElementById(
+                            "state"
+                        )
+                        .value
+                        .trim();
+
+                const pincode =
+                    document
+                        .getElementById(
+                            "pincode"
+                        )
+                        .value
+                        .trim();
+
+                const payment =
+                    document.querySelector(
+                        'input[name="payment"]:checked'
+                    ).value;
+
+
+                if (
+                    customerName.length < 3
+                ) {
+
+                    formError.textContent =
+                        "Enter a valid full name.";
+
+                    return;
+
+                }
+
+
+                if (
+                    !/^[0-9]{10}$/.test(phone)
+                ) {
+
+                    formError.textContent =
+                        "Enter a valid 10-digit phone number.";
+
+                    return;
+
+                }
+
+
+                if (
+                    !/^[0-9]{6}$/.test(pincode)
+                ) {
+
+                    formError.textContent =
+                        "Enter a valid 6-digit PIN code.";
+
+                    return;
+
+                }
+
+
+                let totalPrice = 0;
+
+
+                cart.forEach(function(item) {
+
+                    totalPrice +=
+                        item.price *
+                        item.quantity;
+
+                });
+
+
+                const order = {
+
+                    orderId:
+                        "ORD" + Date.now(),
+
+                    customerName:
+                        customerName,
+
+                    phone:
+                        phone,
+
+                    email:
+                        email,
+
+                    address:
+                        address,
+
+                    city:
+                        city,
+
+                    state:
+                        state,
+
+                    pincode:
+                        pincode,
+
+                    payment:
+                        payment,
+
+                    products:
+                        cart,
+
+                    totalPrice:
+                        totalPrice,
+
+                    orderDate:
+                        new Date()
+                            .toLocaleString(
+                                "en-IN"
+                            )
+
+                };
+
+
+                localStorage.setItem(
+                    "latestOrder",
+                    JSON.stringify(order)
+                );
+
+
+                let previousOrders =
+                    JSON.parse(
+                        localStorage.getItem(
+                            "orders"
+                        )
+                    ) || [];
+
+
+                previousOrders.push(order);
+
+
+                localStorage.setItem(
+                    "orders",
+                    JSON.stringify(
+                        previousOrders
+                    )
+                );
+
+
+                localStorage.removeItem(
+                    "cart"
+                );
+
+
+                window.location.href =
+                    "order-success.html";
+
+            }
+        );
+
+
+        displayCheckoutSummary();
+
+    </script>
+
+</body>
+</html>

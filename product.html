@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Product Details - MyStore</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="navbar">
+
+        <a
+            href="index.html"
+            class="logo-link"
+        >
+            MyStore
+        </a>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                placeholder="Search products"
+                disabled
+            >
+
+            <button type="button">
+                🔍
+            </button>
+
+        </div>
+
+        <a
+            href="cart.html"
+            class="cart-link"
+        >
+            🛒 Cart
+
+            <span id="cartCount">
+                0
+            </span>
+        </a>
+
+    </header>
+
+
+    <!-- PRODUCT DETAILS -->
+
+    <main class="product-details-page">
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            ← Back to Products
+        </a>
+
+        <section
+            class="product-details-card"
+            id="productDetails"
+        >
+
+            <p>
+                Loading product...
+            </p>
+
+        </section>
+
+
+        <!-- REVIEWS -->
+
+        <section class="reviews-section">
+
+            <h2>
+                Customer Reviews
+            </h2>
+
+            <div class="review-summary">
+
+                <h3>
+                    <span id="averageRating">
+                        0.0
+                    </span>
+
+                    ⭐
+                </h3>
+
+                <p>
+                    <span id="reviewCount">
+                        0
+                    </span>
+
+                    Reviews
+                </p>
+
+            </div>
+
+            <div id="reviewsList">
+
+                <p>
+                    No reviews yet.
+                </p>
+
+            </div>
+
+
+            <div class="review-form">
+
+                <h3>
+                    Write a Review
+                </h3>
+
+                <input
+                    type="text"
+                    id="reviewName"
+                    placeholder="Your name"
+                >
+
+                <select id="reviewRating">
+
+                    <option value="">
+                        Select rating
+                    </option>
+
+                    <option value="5">
+                        ★★★★★
+                    </option>
+
+                    <option value="4">
+                        ★★★★
+                    </option>
+
+                    <option value="3">
+                        ★★★
+                    </option>
+
+                    <option value="2">
+                        ★★
+                    </option>
+
+                    <option value="1">
+                        ★
+                    </option>
+
+                </select>
+
+                <textarea
+                    id="reviewComment"
+                    placeholder="Write your review"
+                ></textarea>
+
+                <button
+                    type="button"
+                    id="submitReviewButton"
+                >
+                    Submit Review
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            © 2026 MyStore. All rights reserved.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        /* ==============================
+           DEFAULT PRODUCTS
+        ============================== */
+
+        const defaultProducts = [
+
+            {
+                id: "1",
+                name: "Gaming Laptop",
+                searchName: "gaming laptop computer",
+                price: 49999,
+                category: "Laptops",
+                image: "images/laptop.jpg",
+                rating: 4
+            },
+
+            {
+                id: "2",
+                name: "Smartphone",
+                searchName: "smartphone mobile phone",
+                price: 14999,
+                category: "Mobiles",
+                image: "images/mobile.jpg",
+                rating: 5
+            },
+
+            {
+                id: "3",
+                name: "Wireless Headphones",
+                searchName: "wireless headphones electronics",
+                price: 1999,
+                category: "Electronics",
+                image: "images/headphone.jpg",
+                rating: 4
+            }
+
+        ];
+
+
+        /* ==============================
+           LOAD DATA
+        ============================== */
+
+        let storeProducts =
+            JSON.parse(
+                localStorage.getItem("storeProducts")
+            );
+
+
+        if (
+            !storeProducts ||
+            storeProducts.length === 0
+        ) {
+
+            storeProducts =
+                defaultProducts;
+
+            localStorage.setItem(
+                "storeProducts",
+                JSON.stringify(storeProducts)
+            );
+
+        }
+
+
+        let cart =
+            JSON.parse(
+                localStorage.getItem("cart")
+            ) || [];
+
+
+        const selectedProductId =
+            localStorage.getItem(
+                "selectedProductId"
+            );
+
+
+        const productDetails =
+            document.getElementById(
+                "productDetails"
+            );
+
+
+        /* ==============================
+           HELPER FUNCTIONS
+        ============================== */
+
+        function formatPrice(price) {
+
+            return "₹" +
+                Number(price)
+                    .toLocaleString("en-IN");
+
+        }
+
+
+        function createStars(rating) {
+
+            let stars = "";
+
+            for (
+                let number = 1;
+                number <= 5;
+                number++
+            ) {
+
+                if (number <= rating) {
+
+                    stars += "★";
+
+                } else {
+
+                    stars += "☆";
+
+                }
+
+            }
+
+            return stars;
+
+        }
+
+
+        function saveCart() {
+
+            localStorage.setItem(
+                "cart",
+                JSON.stringify(cart)
+            );
+
+        }
+
+
+        function updateCartCount() {
+
+            const cartCount =
+                document.getElementById(
+                    "cartCount"
+                );
+
+
+            let totalQuantity = 0;
+
+
+            cart.forEach(
+                function (item) {
+
+                    totalQuantity +=
+                        Number(
+                            item.quantity || 1
+                        );
+
+                }
+            );
+
+
+            cartCount.textContent =
+                totalQuantity;
+
+        }
+
+
+        /* ==============================
+           FIND SELECTED PRODUCT
+        ============================== */
+
+        function getSelectedProduct() {
+
+            return storeProducts.find(
+                function (item) {
+
+                    return String(item.id) ===
+                        String(selectedProductId);
+
+                }
+            );
+
+        }
+
+
+        /* ==============================
+           DISPLAY PRODUCT
+        ============================== */
+
+        function displayProduct() {
+
+            const product =
+                getSelectedProduct();
+
+
+            if (!product) {
+
+                productDetails.innerHTML = `
+
+                    <div class="product-not-found">
+
+                        <h2>
+                            Product not found
+                        </h2>
+
+                        <p>
+                            Please return to the homepage
+                            and select a product again.
+                        </p>
+
+                        <a href="index.html">
+                            Return to Homepage
+                        </a>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            const oldPrice =
+                Math.round(
+                    Number(product.price) * 1.25
+                );
+
+
+            const emiPrice =
+                Math.round(
+                    Number(product.price) / 12
+                );
+
+
+            productDetails.innerHTML = `
+
+                <div class="product-details-image">
+
+                    <div class="image-container">
+
+                        <img
+                            id="mainImage"
+                            class="product-image"
+                            src="${product.image}"
+                            alt="${product.name}"
+                            onerror="
+                                this.src='https://placehold.co/500x500?text=No+Image'
+                            "
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="product-details-info">
+
+                    <p class="product-details-category">
+
+                        ${product.category}
+
+                    </p>
+
+                    <h1>
+
+                        ${product.name}
+
+                    </h1>
+
+                    <div class="details-rating">
+
+                        ${createStars(
+                            Number(
+                                product.rating || 0
+                            )
+                        )}
+
+                        <span>
+
+                            ${product.rating || 0}
+                            out of 5
+
+                        </span>
+
+                    </div>
+
+                    <hr>
+
+
+                    <div class="product-price-box">
+
+                        <span class="discount-price">
+
+                            ${formatPrice(
+                                product.price
+                            )}
+
+                        </span>
+
+                        <span class="old-price">
+
+                            ${formatPrice(
+                                oldPrice
+                            )}
+
+                        </span>
+
+                    </div>
+
+                    <p class="discount-text">
+
+                        20% off
+
+                    </p>
+
+                    <p class="delivery-text">
+
+                        ✔ FREE Delivery
+
+                    </p>
+
+                    <p class="delivery-date">
+
+                        🚚 Delivery by Tomorrow
+
+                    </p>
+
+                    <p class="emi-text">
+
+                        💳 EMI from
+                        ${formatPrice(emiPrice)}
+                        per month
+
+                    </p>
+
+                    <p class="coupon-text">
+
+                        🎁 Coupon ₹500 OFF
+
+                    </p>
+
+                    <p class="stock-text">
+
+                        🔥 In Stock
+
+                    </p>
+
+
+                    <div class="quantity-box">
+
+                        <label for="productQuantity">
+
+                            Quantity:
+
+                        </label>
+
+                        <select id="productQuantity">
+
+                            <option value="1">
+                                1
+                            </option>
+
+                            <option value="2">
+                                2
+                            </option>
+
+                            <option value="3">
+                                3
+                            </option>
+
+                            <option value="4">
+                                4
+                            </option>
+
+                            <option value="5">
+                                5
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="product-details-buttons">
+
+                        <button
+                            type="button"
+                            id="addProductToCart"
+                            class="add-cart"
+                        >
+                            Add to Cart
+                        </button>
+
+                        <button
+                            type="button"
+                            id="buyProductNow"
+                            class="buy-now"
+                        >
+                            Buy Now
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            connectProductButtons(product);
+
+        }
+
+
+        /* ==============================
+           PRODUCT BUTTONS
+        ============================== */
+
+        function connectProductButtons(product) {
+
+            const addButton =
+                document.getElementById(
+                    "addProductToCart"
+                );
+
+
+            const buyButton =
+                document.getElementById(
+                    "buyProductNow"
+                );
+
+
+            const quantitySelect =
+                document.getElementById(
+                    "productQuantity"
+                );
+
+
+            addButton.addEventListener(
+                "click",
+                function () {
+
+                    const quantity =
+                        Number(
+                            quantitySelect.value
+                        );
+
+
+                    addProductToCart(
+                        product,
+                        quantity
+                    );
+
+
+                    addButton.textContent =
+                        "Added ✓";
+
+
+                    setTimeout(
+                        function () {
+
+                            addButton.textContent =
+                                "Add to Cart";
+
+                        },
+                        1000
+                    );
+
+                }
+            );
+
+
+            buyButton.addEventListener(
+                "click",
+                function () {
+
+                    const quantity =
+                        Number(
+                            quantitySelect.value
+                        );
+
+
+                    const buyNowCart = [
+
+                        {
+                            id: product.id,
+                            name: product.name,
+                            price:
+                                Number(
+                                    product.price
+                                ),
+                            image:
+                                product.image,
+                            quantity:
+                                quantity
+                        }
+
+                    ];
+
+
+                    localStorage.setItem(
+                        "cart",
+                        JSON.stringify(
+                            buyNowCart
+                        )
+                    );
+
+
+                    window.location.href =
+                        "checkout.html";
+
+                }
+            );
+
+        }
+
+
+        /* ==============================
+           ADD TO CART
+        ============================== */
+
+        function addProductToCart(
+            product,
+            quantity
+        ) {
+
+            const existingProduct =
+                cart.find(
+                    function (item) {
+
+                        return String(item.id) ===
+                            String(product.id);
+
+                    }
+                );
+
+
+            if (existingProduct) {
+
+                existingProduct.quantity =
+                    Number(
+                        existingProduct.quantity || 1
+                    ) +
+                    Number(quantity);
+
+            } else {
+
+                cart.push({
+
+                    id:
+                        product.id,
+
+                    name:
+                        product.name,
+
+                    price:
+                        Number(
+                            product.price
+                        ),
+
+                    image:
+                        product.image,
+
+                    quantity:
+                        Number(quantity)
+
+                });
+
+            }
+
+
+            saveCart();
+
+            updateCartCount();
+
+        }
+
+
+        /* ==============================
+           REVIEWS
+        ============================== */
+
+        function getAllReviews() {
+
+            return JSON.parse(
+                localStorage.getItem(
+                    "productReviews"
+                )
+            ) || [];
+
+        }
+
+
+        function getProductReviews() {
+
+            const allReviews =
+                getAllReviews();
+
+
+            return allReviews.filter(
+                function (review) {
+
+                    return String(
+                        review.productId
+                    ) ===
+                    String(
+                        selectedProductId
+                    );
+
+                }
+            );
+
+        }
+
+
+        function loadReviews() {
+
+            const productReviews =
+                getProductReviews();
+
+
+            const reviewsList =
+                document.getElementById(
+                    "reviewsList"
+                );
+
+
+            const averageRating =
+                document.getElementById(
+                    "averageRating"
+                );
+
+
+            const reviewCount =
+                document.getElementById(
+                    "reviewCount"
+                );
+
+
+            reviewCount.textContent =
+                productReviews.length;
+
+
+            if (
+                productReviews.length === 0
+            ) {
+
+                averageRating.textContent =
+                    "0.0";
+
+
+                reviewsList.innerHTML = `
+
+                    <p>
+                        No reviews yet.
+                    </p>
+
+                `;
+
+                return;
+
+            }
+
+
+            let totalRating = 0;
+
+
+            productReviews.forEach(
+                function (review) {
+
+                    totalRating +=
+                        Number(
+                            review.rating
+                        );
+
+                }
+            );
+
+
+            const average =
+                totalRating /
+                productReviews.length;
+
+
+            averageRating.textContent =
+                average.toFixed(1);
+
+
+            reviewsList.innerHTML = "";
+
+
+            productReviews.forEach(
+                function (review) {
+
+                    const reviewCard =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    reviewCard.className =
+                        "review-card";
+
+
+                    reviewCard.innerHTML = `
+
+                        <h4>
+
+                            ${review.name}
+
+                        </h4>
+
+                        <div class="review-stars">
+
+                            ${createStars(
+                                Number(
+                                    review.rating
+                                )
+                            )}
+
+                        </div>
+
+                        <p>
+
+                            ${review.comment}
+
+                        </p>
+
+                        <small>
+
+                            ${review.date}
+
+                        </small>
+
+                    `;
+
+
+                    reviewsList.appendChild(
+                        reviewCard
+                    );
+
+                }
+            );
+
+        }
+
+
+        function submitReview() {
+
+            const nameInput =
+                document.getElementById(
+                    "reviewName"
+                );
+
+
+            const ratingInput =
+                document.getElementById(
+                    "reviewRating"
+                );
+
+
+            const commentInput =
+                document.getElementById(
+                    "reviewComment"
+                );
+
+
+            const name =
+                nameInput.value.trim();
+
+
+            const rating =
+                ratingInput.value;
+
+
+            const comment =
+                commentInput.value.trim();
+
+
+            if (
+                !name ||
+                !rating ||
+                !comment
+            ) {
+
+                alert(
+                    "Please fill all review fields."
+                );
+
+                return;
+
+            }
+
+
+            const reviews =
+                getAllReviews();
+
+
+            reviews.push({
+
+                productId:
+                    String(
+                        selectedProductId
+                    ),
+
+                name:
+                    name,
+
+                rating:
+                    Number(rating),
+
+                comment:
+                    comment,
+
+                date:
+                    new Date()
+                        .toLocaleDateString(
+                            "en-IN"
+                        )
+
+            });
+
+
+            localStorage.setItem(
+                "productReviews",
+                JSON.stringify(reviews)
+            );
+
+
+            nameInput.value = "";
+
+            ratingInput.value = "";
+
+            commentInput.value = "";
+
+
+            alert(
+                "Review added successfully ⭐"
+            );
+
+
+            loadReviews();
+
+        }
+
+
+        const submitReviewButton =
+            document.getElementById(
+                "submitReviewButton"
+            );
+
+
+        submitReviewButton.addEventListener(
+            "click",
+            submitReview
+        );
+
+
+        /* ==============================
+           START PAGE
+        ============================== */
+
+        updateCartCount();
+
+        displayProduct();
+
+        loadReviews();
+
+    </script>
+
+</body>
+
+</html>
