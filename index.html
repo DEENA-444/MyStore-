@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MyStore</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">
+            MyStore
+        </div>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search products"
+            >
+
+            <button id="searchButton">
+                🔍
+            </button>
+
+<a href="login.html" class="account-link" id="accountLink">
+    Hello, Sign in<br>
+    <strong>Account</strong>
+</a>
+
+<a href="orders.html" class="orders-link">
+    My Orders
+</a>
+
+<a href="cart.html" class="cart-link">
+    🛒 Cart
+    <span id="cartCount">0</span>
+</a>
+
+<a href="wishlist.html" class="wishlist-link">
+    ❤️ Wishlist
+</a>
+
+
+
+    </header>
+
+    <nav class="category-nav">
+
+    <a href="index.html">Home</a>
+
+    <a href="#">Mobiles</a>
+
+    <a href="#">Laptops</a>
+
+    <a href="#">Electronics</a>
+
+    <a href="#">Fashion</a>
+
+    <a href="#">Grocery</a>
+
+    <a href="#">Sports</a>
+
+    <a href="#">Books</a>
+
+</nav>
+
+    <section class="slider">
+
+    <div class="slide active">
+
+        <img src="images/headphone.jpg" alt="Headphone Offer">
+
+        <div class="slide-text">
+            <h2>Big Electronics Sale</h2>
+            <p>Best products at the best price</p>
+        </div>
+
+    </div>
+
+    <div class="slide">
+
+        <img src="images/laptop.jpg" alt="Laptop Offer">
+
+        <div class="slide-text">
+            <h2>Laptop Special Deals</h2>
+            <p>Powerful laptops for study and gaming</p>
+        </div>
+
+    </div>
+
+    <div class="slide">
+
+        <img src="images/mobile.jpg" alt="Mobile Offer">
+
+        <div class="slide-text">
+            <h2>Mobile Mega Sale</h2>
+            <p>Latest smartphones at amazing prices</p>
+        </div>
+
+    </div>
+
+    <button id="previousSlide" class="slider-button previous-button">
+        ❮
+    </button>
+
+    <button id="nextSlide" class="slider-button next-button">
+        ❯
+    </button>
+
+</section>
+    
+
+    <section
+
+    <section class="filter-section">
+
+    <h2>Filters</h2>
+
+    <select id="categoryFilter">
+        <option value="all">All Categories</option>
+        <option value="Laptops">Laptops</option>
+        <option value="Mobiles">Mobiles</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Watch">Watch</option>
+    </select>
+
+    <select id="priceFilter">
+        <option value="all">All Prices</option>
+        <option value="1000">Under ₹1,000</option>
+        <option value="5000">Under ₹5,000</option>
+        <option value="10000">Under ₹10,000</option>
+        <option value="50000">Under ₹50,000</option>
+    </select>
+
+    <select id="ratingFilter">
+        <option value="all">All Ratings</option>
+        <option value="5">★★★★★</option>
+        <option value="4">★★★★ & Up</option>
+        <option value="3">★★★ & Up</option>
+    </select>
+
+    <select id="sortProducts">
+        <option value="default">Sort By</option>
+        <option value="low">Price : Low to High</option>
+        <option value="high">Price : High to Low</option>
+        <option value="rating">Highest Rated</option>
+    </select>
+
+</section>
+        <section class="product-section" id="productSection">
+
+    <h2>🔥 Today's Deals</h2>
+
+    <div id="productsContainer" class="products"></div>
+
+    <p id="noResults" style="display:none;">
+        No products found.
+    </p>
+
+</section>
+
+  
+
+    <footer>
+
+        <p>
+            © 2026 MyStore. All rights reserved.
+        </p>
+
+    </footer>
+
+    <script src="script.js?v=2"></script>
+
+</body>
+</html>
