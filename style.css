@@ -1974,3 +1974,30 @@ img {
         margin-left: auto;
     }
 }
+
+.account-area{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    margin-left:20px;
+}
+
+.account-area a{
+    color:white;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:500;
+}
+
+.account-area a:hover{
+    color:#febd69;
+}
+
+.cart-link span{
+    background:#ff9900;
+    color:#000;
+    border-radius:50%;
+    padding:2px 7px;
+    margin-left:5px;
+    font-weight:bold;
+}
